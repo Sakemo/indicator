@@ -1,0 +1,37 @@
+input
+  FastAverage(9);
+  MiddleAverage(20);
+  ExpAverage(50);
+var
+  FastMA        : Float;
+  MiddleMA      : Float;
+  ExpMA         : Float;
+  Trend         : Boolean;
+  Filter        : Boolean;
+  FilterSell    : Boolean;
+  CandleSize    : Float;
+  CandleBody    : Float;
+  CandleWickAbs : Float;
+  WickFactor    : Float;
+begin
+  CandleSize := Abs(Close[1] - Open[1]);
+  CandleBody := Abs(Close[1] - Open[1]);
+  CandleWickAbs := CandleSize - CandleBody;
+  WickFactor := 0.25;
+  //Calculo das médias
+  FastMA := Media(FastAverage,Close[1]);
+  MiddleMA := Media(MiddleAverage,Close[1]);
+  ExpMA := MediaExp(ExpAverage,Close[1]);
+  //Condições de compra
+  if (FastMA > MiddleMA) and (MiddleMA > ExpMA) and (Low[1] < MiddleMA) and (High[1] > MiddleMA) then
+    begin
+      if (open[1] >= MiddleMA) and (close[1] > FastMA) and (CandleWickAbs < (CandleSize * WickFactor)) then
+        BuyAtMarket;
+    end;
+  //Condições de venda
+  if (FastMA < MiddleMA) and (MiddleMA < ExpMA) and (Low[1] < MiddleMA) and (High[1] > MiddleMA) then
+    begin
+      if (open[1] >= MiddleMA) and (close[1] < FastMA) and (CandleWickAbs < (CandleSize * WickFactor)) then
+        sellshortatmarket;
+    end;
+end;
